@@ -11,3 +11,5 @@ vim.opt.expandtab = true
 
 vim.opt.timeoutlen = 500
 vim.opt.updatetime = 50
+
+vim.opt.tags = '.tags'
