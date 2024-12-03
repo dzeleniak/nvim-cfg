@@ -79,6 +79,8 @@ return {
 								typeCheckingMode = "off",
 								autoSearchPaths = true,
 								useLibraryCodeForTypes = true,
+								venvPath = ".",
+								venv = ".venv",
 							},
 						},
 					},
