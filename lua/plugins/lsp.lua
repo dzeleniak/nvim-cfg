@@ -16,10 +16,13 @@ return {
 						mode = mode or "n"
 						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
 					end
-					map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-					map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-					map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-					map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+					map("<leader>gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+					map("<leader>gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+
+					map("<leader>gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+					map("<leader>gi", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+					map("<leader>gtd", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+
 					map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
 
 					map(
@@ -29,10 +32,11 @@ return {
 					)
 
 					map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-					map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction", { "n", "x" })
-					map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+
+					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { noremap = true, silent = true })
 					map("<leader>hd", vim.lsp.buf.hover, "[H]over documentation")
 
+					-- Reference highlighting
 					local client = vim.lsp.get_client_by_id(event.data.client_id)
 					if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
 						local highlight_augroup =
@@ -58,6 +62,7 @@ return {
 						})
 					end
 
+					-- Toggle
 					if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
 						map("<leader>th", function()
 							vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
@@ -76,11 +81,13 @@ return {
 					settings = {
 						python = {
 							analysis = {
-								typeCheckingMode = "off",
-								autoSearchPaths = true,
-								useLibraryCodeForTypes = true,
-								venvPath = ".",
-								venv = ".venv",
+								typeCheckingMode = "off", -- Disable type checking (optional)
+								diagnosticMode = "workspace", -- "openFilesOnly" to limit to open files
+								-- disableOrganizeImports = true,
+								diagnosticSeverityOverrides = {
+									reportGeneralTypeIssues = "none", -- Suppress general type issues
+									reportOptionalMemberAccess = "none", -- Suppress optional access warnings
+								},
 							},
 						},
 					},
@@ -116,7 +123,24 @@ return {
 			})
 		end,
 	},
+	{
+		"jose-elias-alvarez/null-ls.nvim",
+		config = function()
+			local null_ls = require("null-ls")
 
+			null_ls.setup({
+				sources = {
+					-- Ruff for formatting (optional)
+					null_ls.builtins.formatting.ruff,
+				},
+			})
+
+			-- Automatically format on save
+			vim.cmd([[
+ 				autocmd BufWritePre *.py lua vim.lsp.buf.format({ async = false })
+ 		]])
+		end,
+	},
 	{ -- Autoformat
 		"stevearc/conform.nvim",
 		event = { "BufWritePre" },
@@ -148,8 +172,8 @@ return {
 			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
-				-- python = { "isort", "black" },
-				-- javascript = { "prettierd", "prettier", stop_after_first = true },
+				python = { "isort", "black", "ruff" },
+				javascript = { "prettierd", "prettier", stop_after_first = true },
 			},
 		},
 	},
@@ -159,6 +183,7 @@ return {
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-nvim-lsp-signature-help",
 		},
 		config = function()
 			-- See `:help cmp`
@@ -190,6 +215,7 @@ return {
 				sources = {
 					{ name = "nvim_lsp" },
 					{ name = "path" },
+					{ name = "nvim_lsp_signature_help" },
 				},
 			})
 

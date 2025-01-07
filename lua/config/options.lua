@@ -13,3 +13,15 @@ vim.opt.timeoutlen = 2000
 vim.opt.updatetime = 50
 
 vim.opt.tags = ".tags"
+
+-- Diagnostic display settings
+vim.diagnostic.config({
+	virtual_text = true, -- Show inline diagnostics
+	signs = true, -- Show signs in the gutter
+	underline = true, -- Underline problematic code
+	update_in_insert = false,
+	severity_sort = true,
+})
+
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
