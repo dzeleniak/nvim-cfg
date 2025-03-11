@@ -1,3 +1,2 @@
-require("config.mappings")
-require("config.options")
-require("config.packages")
+-- bootstrap lazy.nvim, LazyVim and your plugins
+require("config.lazy")
