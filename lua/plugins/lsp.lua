@@ -123,24 +123,6 @@ return {
 			})
 		end,
 	},
-	{
-		"jose-elias-alvarez/null-ls.nvim",
-		config = function()
-			local null_ls = require("null-ls")
-
-			null_ls.setup({
-				sources = {
-					-- Ruff for formatting (optional)
-					null_ls.builtins.formatting.ruff,
-				},
-			})
-
-			-- Automatically format on save
-			vim.cmd([[
- 				autocmd BufWritePre *.py lua vim.lsp.buf.format({ async = false })
- 		]])
-		end,
-	},
 	{ -- Autoformat
 		"stevearc/conform.nvim",
 		event = { "BufWritePre" },
